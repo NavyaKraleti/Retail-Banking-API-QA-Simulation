@@ -1,197 +1,242 @@
-# Retail Banking API – QA Simulation Project
+# Retail Banking API QA Simulation
 
-This project simulates a **Retail Banking API testing environment** to demonstrate real-world **QA practices for financial systems**, including API functional testing, negative testing, compliance validation, automation execution, and defect identification.
-
-The project replicates typical banking workflows such as **customer management, account handling, and funds transfer**, and demonstrates how QA engineers validate system behavior under normal, edge-case, and invalid conditions.
-
----
-
-# Project Objectives
-
-The primary objective of this project is to simulate how **QA engineers test banking APIs** in real-world fintech environments.
-
-Key goals:
-
-• Validate core banking API operations
-• Perform functional and negative API testing
-• Simulate compliance validation scenarios (KYC, AML)
-• Identify defects in transaction processing logic
-• Execute automated API testing using Newman CLI
-• Document test strategy, scenarios, and defects
+A comprehensive API testing and QA automation project simulating a Retail Banking system.
+This project demonstrates end-to-end API testing practices including functional validation, negative testing, compliance checks, automation execution, and defect analysis using Postman and Newman.
 
 ---
 
-# System Architecture
+## Project Overview
 
-The testing architecture follows a simple API automation pipeline.
+The goal of this project is to simulate testing of a Retail Banking API system covering key banking operations such as:
 
-Test data is executed through Postman collections and automated using Newman CLI against a simulated banking API built with JSON Server.
+* Customer creation
+* Account management
+* Funds transfer
+* Compliance validation
+* Fraud and risk scenarios
+
+The project showcases how QA engineers design API test strategies, validate financial transactions, automate execution, and document defects.
+
+---
+
+## Project Objectives
+
+* Design structured API test cases for banking workflows
+* Validate transaction processing and business rules
+* Perform negative and edge-case testing
+* Simulate compliance and fraud detection scenarios
+* Automate API execution using Newman
+* Document defects and testing artifacts professionally
+
+---
+
+## System Architecture
 
 <p align="center">
-  <img src="test-documents/Architecture_Diagram.png" width="600">
+  <img src="test-documents/Architecture_Diagram.png" width="650">
 </p>
 
-**Architecture Flow**
+### Architecture Flow
 
-Test Scenario Data → Postman Collection → Newman CLI Runner → Banking API (JSON Server) → Database (`db.json`)
+Test Data (transactions.csv)
+↓
+Postman API Collection
+↓
+Newman CLI Automation
+↓
+Mock Banking API (JSON Server)
+↓
+Database (db.json)
 
 ---
 
-# Technology Stack
+## Technology Stack
 
 | Tool        | Purpose                             |
 | ----------- | ----------------------------------- |
-| Postman     | API request creation and testing    |
-| Newman CLI  | Automated API test execution        |
-| JSON Server | Mock backend banking API            |
-| Node.js     | API runtime environment             |
-| VS Code     | Development and test environment    |
-| Draw.io     | Architecture diagram creation       |
-| GitHub      | Version control and project hosting |
+| Postman     | API testing & collection management |
+| Newman      | CLI automation runner               |
+| JSON Server | Mock API server                     |
+| Node.js     | Runtime environment                 |
+| GitHub      | Version control                     |
+| Draw.io     | Architecture diagram                |
+| Markdown    | Documentation                       |
 
 ---
 
-# Project Structure
+## Project Structure
 
-```
 Retail-Banking-API-QA-Simulation
 │
-├── banking_api_collection.json      # Postman API collection
-├── banking_env.json                 # Environment variables
-├── transactions.csv                 # Test dataset for automation
-│
-├── db.json                          # Mock database (runtime)
+├── banking_api_collection.json
+├── banking_env.json
+├── transactions.csv
+├── db.json
 │
 ├── test-documents
+│   ├── Architecture_Diagram.png
 │   ├── Test_Strategy.md
 │   ├── Test_Scenario_Matrix.md
-│   ├── Defect_Log.md
-│   └── Architecture_Diagram.png
+│   └── Defect_Log.md
 │
-└── README.md
-```
+├── README.md
+└── .gitignore
 
 ---
 
-# Test Coverage
+## How to Run the Project
 
-The project includes multiple types of testing scenarios commonly used in banking QA.
+### Prerequisites
 
-### Functional Testing
+Install the following tools:
 
-• Customer creation
-• Customer retrieval
-• Account information validation
-• Fund transfer between accounts
+* Node.js
+* Newman
+* Postman (optional for manual testing)
+
+---
+
+### 1. Install Dependencies
+
+npm install
+
+---
+
+### 2. Start the Mock Banking API
+
+npm start
+
+The API server will start at:
+
+http://localhost:3000
+
+---
+
+### 3. Run API Automation Tests
+
+newman run banking_api_collection.json -e banking_env.json -d transactions.csv
+
+This command executes multiple API test scenarios including:
+
+* Functional testing
+* Negative validation
+* Compliance scenarios
+* Fraud detection simulations
+
+---
+
+## Test Coverage
+
+The project covers several important banking test scenarios.
+
+### Customer Management
+
+* Create customer
+* Duplicate customer validation
+* Missing field validation
+
+### Account Management
+
+* Account creation
+* Account status validation
+
+### Transaction Processing
+
+* Funds transfer
+* Balance validation
+* Daily transaction limit checks
 
 ### Negative Testing
 
-• Invalid currency transfers
-• Negative transaction amounts
-• Missing required fields
-• Duplicate transaction attempts
+* Invalid currency transfers
+* Negative amount transactions
+* Missing destination account
 
-### Compliance & Validation
+### Compliance Validation
 
-• Frozen account transaction validation
-• KYC verification checks
-• Transaction validation rules
-
-### Edge Case & Risk Scenarios
-
-• Rapid consecutive transfers
-• High value transactions
-• Duplicate transaction requests
-
-### End-to-End Flows
-
-• Customer creation → account validation → transfer execution
-• Deposit → transfer → balance verification
+* Frozen account transactions
+* AML transaction spikes
+* Rapid consecutive transfers
 
 ---
 
-# Automation Execution
+## Automation Execution
 
-API tests can be executed automatically using **Newman CLI**.
+Automation is executed using **Newman CLI** with external test data.
 
-### Install Newman
+Execution command:
 
-```
-npm install -g newman
-```
+newman run banking_api_collection.json -e banking_env.json -d transactions.csv
 
-### Run API Tests
-
-```
-newman run banking_api_collection.json \
--e banking_env.json \
--d transactions.csv
-```
-
-This executes multiple API scenarios sequentially using the provided test dataset.
+The automation simulates multiple transaction scenarios automatically using the dataset.
 
 ---
 
-# Defect Analysis
+## Defect Analysis
 
-During testing several validation gaps were identified in the simulated banking API, including:
+During testing, several defects were identified and documented.
 
-• Duplicate transaction ID acceptance
-• Invalid currency validation missing
-• Frozen account still allowing transactions
-• Negative transfer amount acceptance
-• Customer creation without KYC validation
+| Defect ID | Description                                 | Severity |
+| --------- | ------------------------------------------- | -------- |
+| DEF-01    | Duplicate transaction ID allowed            | High     |
+| DEF-02    | Invalid currency accepted                   | Medium   |
+| DEF-03    | Frozen account still processes transactions | Critical |
+| DEF-04    | Negative transaction amount accepted        | High     |
+| DEF-05    | Customer created without KYC validation     | High     |
 
-Detailed defect documentation is available in:
+Complete defect documentation can be found in:
 
-```
 test-documents/Defect_Log.md
-```
 
 ---
 
-# QA Artifacts
+## QA Artifacts
 
-The project includes the following QA documentation:
+The project includes professional QA documentation.
 
-| Document             | Description                              |
-| -------------------- | ---------------------------------------- |
-| Test Strategy        | Testing approach and methodology         |
-| Test Scenario Matrix | Coverage of all functional scenarios     |
-| Defect Log           | Identified issues and reproduction steps |
-| Architecture Diagram | API testing architecture overview        |
+| Document             | Description                    |
+| -------------------- | ------------------------------ |
+| Test Strategy        | Overall testing approach       |
+| Test Scenario Matrix | Coverage of banking test cases |
+| Defect Log           | Identified defects             |
+| Architecture Diagram | API testing architecture       |
 
----
+Location:
 
-# Key Learning Outcomes
-
-This project demonstrates practical QA skills including:
-
-• API testing strategy design
-• Postman collection development
-• Automation execution using Newman
-• Negative and edge-case testing
-• Defect discovery and documentation
-• QA artifact documentation
+test-documents/
 
 ---
 
-# Future Enhancements
+## Key Learning Outcomes
 
-Potential improvements for the project include:
+This project demonstrates practical QA engineering skills including:
 
-• CI/CD pipeline integration (GitHub Actions)
-• Automated test reporting
-• Performance testing using JMeter or k6
-• Security validation scenarios
-• Mock fraud detection rule simulation
+* API testing using Postman
+* Automation using Newman CLI
+* Negative and edge-case validation
+* Banking transaction rule validation
+* Defect documentation and analysis
+* Test strategy and scenario design
+* Automation data-driven testing
 
 ---
 
-# Author
+## Future Enhancements
+
+Possible improvements include:
+
+* CI/CD integration with GitHub Actions
+* Automated test reporting dashboards
+* Performance testing with k6 or JMeter
+* Security testing for authentication and authorization
+* Integration with test management tools
+
+---
+
+## Author
 
 Navya Kraleti
-Quality Assurance Engineer
-API Testing | Data Testing | Automation Testing
 
----
+Quality Assurance Engineer
+
+GitHub: https://github.com/NavyaKraleti
