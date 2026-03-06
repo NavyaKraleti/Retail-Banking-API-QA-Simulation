@@ -33,20 +33,12 @@ The project showcases how QA engineers design API test strategies, validate fina
 ## System Architecture
 
 <p align="center">
-  <img src="test-documents/Architecture_Diagram.png" width="650">
+  <img src="test-documents/Architecture_Diagram.png" width="500">
 </p>
 
 ### Architecture Flow
 
-Test Data (transactions.csv)
-↓
-Postman API Collection
-↓
-Newman CLI Automation
-↓
-Mock Banking API (JSON Server)
-↓
-Database (db.json)
+Test Data (transactions.csv) → Postman API Collection → Newman CLI Automation → Mock Banking API (JSON Server) → Database (db.json)
 
 ---
 
