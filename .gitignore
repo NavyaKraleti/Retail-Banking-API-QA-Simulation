@@ -1,0 +1,15 @@
+# Runtime database
+db.json
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+
+# Newman reports
+newman/
+
+# OS files
+.DS_Store
+Thumbs.db

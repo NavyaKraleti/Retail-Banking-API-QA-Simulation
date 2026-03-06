@@ -1,0 +1,1794 @@
+{
+  "info": {
+    "_postman_id": "b9ca9c01-68f9-4d6d-80e4-df0542f04977",
+    "name": "Retail Banking API – QA Simulation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51086906",
+    "_collection_link": "https://go.postman.co/collection/51086906-b9ca9c01-68f9-4d6d-80e4-df0542f04977?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "00_Environment & Setup",
+      "item": [
+        {
+          "name": "Initialize Banking Rules",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Banking Rule Initialization\r",
+                  "\r",
+                  "pm.environment.set(\"currentBalance\", 15000);\r",
+                  "pm.environment.set(\"accountStatus\", \"Active\");\r",
+                  "pm.environment.set(\"transactionLimit\", 10000);\r",
+                  "pm.environment.set(\"dailyDebitTotal\", 0);\r",
+                  "\r",
+                  "console.log(\"Banking rules initialized.\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Banking rules initialized successfully\", function () {\r",
+                  "    pm.expect(pm.environment.get(\"accountStatus\")).to.eql(\"Active\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": {{withdrawAmount}}\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}",
+              "host": [
+                "{{base_url}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Fetch Account ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "if (res.length > 0) {\r",
+                  "    pm.environment.set(\"accountId\", res[0].id);\r",
+                  "    console.log(\"Account ID set:\", res[0].id);\r",
+                  "}\r",
+                  "\r",
+                  "pm.test(\"Account ID fetched successfully\", function () {\r",
+                  "    pm.expect(pm.environment.get(\"accountId\")).to.not.be.undefined;\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 1000,\r\n  \"currency\": \"{{currency}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/accounts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "01_Customer Management",
+      "item": [
+        {
+          "name": "Create Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.environment.set(\"customerId\", res.customerId);\r",
+                  "\r",
+                  "pm.test(\"Customer created successfully\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Customer has valid ID\", function () {\r",
+                  "    pm.expect(res.customerId).to.exist;\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"customerId\": \"CUST{{$randomInt}}\",\r\n  \"name\": \"Navya K\",\r\n  \"email\": \"navya@testbank.com\",\r\n  \"kycStatus\": \"Verified\",\r\n  \"riskCategory\": \"Low\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/customers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Customer list retrieved\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Customers exist in system\", function () {\r",
+                  "    pm.expect(res.length).to.be.above(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"customerId\": \"CUST{{$randomInt}}\",\r\n  \"name\": \"Navya K\",\r\n  \"email\": \"navya@testbank.com\",\r\n  \"kycStatus\": \"Verified\",\r\n  \"riskCategory\": \"Low\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/customers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Duplicate Customer Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Duplicate customer creation allowed (Defect)\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Customer ID duplicated\", function () {\r",
+                  "    pm.expect(res.customerId).to.eql(\"CUST001\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"customerId\": \"CUST001\",\r\n  \"name\": \"Duplicate Customer\",\r\n  \"email\": \"duplicate@testbank.com\",\r\n  \"kycStatus\": \"Verified\",\r\n  \"riskCategory\": \"Low\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/customers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Missing Field Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Customer created with missing mandatory fields (Validation Defect)\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Customer missing required attributes\", function () {\r",
+                  "    pm.expect(res.name).to.eql(\"Incomplete Customer\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Incomplete Customer\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/customers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Missing KYC Compliance Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Customer created without KYC (Compliance issue)\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"customerId\": \"CUST888\",\r\n  \"name\": \"Unverified Customer\",\r\n  \"email\": \"no-kyc@testbank.com\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/customers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02_Account Management",
+      "item": [
+        {
+          "name": "Validate Account Status Before Transaction",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Ensure account is Active before transaction\r",
+                  "\r",
+                  "let status = pm.environment.get(\"accountStatus\");\r",
+                  "\r",
+                  "if (status !== \"Active\") {\r",
+                  "    throw new Error(\"Account is not Active. Transactions should be blocked.\");\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Account is Active for transaction processing\", function () {\r",
+                  "    pm.expect(pm.environment.get(\"accountStatus\")).to.eql(\"Active\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/accounts/{{accountId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "accounts",
+                "{{accountId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Freeze Account (Compliance Trigger)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Simulate AML / Compliance freeze\r",
+                  "\r",
+                  "pm.environment.set(\"accountStatus\", \"Frozen\");\r",
+                  "\r",
+                  "console.log(\"Account status updated to Frozen due to compliance trigger.\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Simulate AML / Compliance freeze\r",
+                  "\r",
+                  "pm.environment.set(\"accountStatus\", \"Frozen\");\r",
+                  "\r",
+                  "console.log(\"Account status updated to Frozen due to compliance trigger.\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}",
+              "host": [
+                "{{base_url}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03_Transaction Processing",
+      "item": [
+        {
+          "name": "Withdraw – Debit Transaction",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// ===============================\r",
+                  "// Retail Banking Debit Validation\r",
+                  "// ===============================\r",
+                  "\r",
+                  "let status = pm.environment.get(\"accountStatus\");\r",
+                  "let currentBalance = Number(pm.environment.get(\"currentBalance\"));\r",
+                  "let dailyDebitTotal = Number(pm.environment.get(\"dailyDebitTotal\"));\r",
+                  "let transactionLimit = Number(pm.environment.get(\"transactionLimit\"));\r",
+                  "\r",
+                  "let requestBody = JSON.parse(pm.request.body.raw);\r",
+                  "let amount = Number(4000); // fixed debit for now\r",
+                  "\r",
+                  "// 1. Status validation\r",
+                  "if (status !== \"Active\") {\r",
+                  "    throw new Error(\"Transaction blocked: Account not Active.\");\r",
+                  "}\r",
+                  "\r",
+                  "// 2. Amount validation\r",
+                  "if (amount <= 0) {\r",
+                  "    throw new Error(\"Invalid transaction amount.\");\r",
+                  "}\r",
+                  "\r",
+                  "// 3. Insufficient funds\r",
+                  "if (amount > currentBalance) {\r",
+                  "    throw new Error(\"Insufficient balance.\");\r",
+                  "}\r",
+                  "\r",
+                  "// 4. Daily limit\r",
+                  "if ((dailyDebitTotal + amount) > transactionLimit) {\r",
+                  "    throw new Error(\"Daily transaction limit exceeded.\");\r",
+                  "}\r",
+                  "\r",
+                  "// Calculate new balance\r",
+                  "let newBalance = currentBalance - amount;\r",
+                  "\r",
+                  "// Update environment\r",
+                  "pm.environment.set(\"currentBalance\", newBalance);\r",
+                  "pm.environment.set(\"dailyDebitTotal\", dailyDebitTotal + amount);\r",
+                  "\r",
+                  "// Update request body dynamically\r",
+                  "pm.request.body.update({\r",
+                  "    mode: 'raw',\r",
+                  "    raw: JSON.stringify({\r",
+                  "        balance: newBalance,\r",
+                  "        currency: pm.environment.get(\"currency\")\r",
+                  "    })\r",
+                  "});\r",
+                  "\r",
+                  "console.log(\"New balance calculated:\", newBalance);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Debit transaction processed\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Balance updated correctly\", function () {\r",
+                  "    let updatedBalance = pm.environment.get(\"currentBalance\");\r",
+                  "    pm.expect(updatedBalance).to.be.a(\"number\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"balance\": 0\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/accounts/{{accountId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "accounts",
+                "{{accountId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04_Funds Transfer & Payments",
+      "item": [
+        {
+          "name": "Transfer – Basic",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "let sourceId = pm.environment.get(\"sourceAccountId\");",
+                  "let destinationId = pm.environment.get(\"destinationAccountId\");",
+                  "let amount = Number(pm.environment.get(\"transferAmount\"));",
+                  "",
+                  "// Fetch source account",
+                  "pm.sendRequest(`${pm.environment.get(\"base_url\")}/accounts/${sourceId}`, function (err, sourceRes) {",
+                  "    if (err || !sourceRes) {",
+                  "        console.error(\"Failed to fetch source account:\", err);",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    let sourceAccount = sourceRes.json();",
+                  "    if (!sourceAccount) {",
+                  "        console.error(\"Source account response is not valid JSON\");",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    // Fetch destination account",
+                  "    pm.sendRequest(`${pm.environment.get(\"base_url\")}/accounts/${destinationId}`, function (err2, destRes) {",
+                  "        if (err2 || !destRes) {",
+                  "            console.error(\"Failed to fetch destination account:\", err2);",
+                  "            return;",
+                  "        }",
+                  "",
+                  "        let destinationAccount = destRes.json();",
+                  "        if (!destinationAccount) {",
+                  "            console.error(\"Destination account response is not valid JSON\");",
+                  "            return;",
+                  "        }",
+                  "",
+                  "        // Validate sufficient balance",
+                  "        if (sourceAccount.balance < amount) {",
+                  "            console.error(\"Insufficient balance in source account. Balance:\", sourceAccount.balance, \"Transfer amount:\", amount);",
+                  "            return;",
+                  "        }",
+                  "",
+                  "        let newSourceBalance = sourceAccount.balance - amount;",
+                  "        let newDestinationBalance = destinationAccount.balance + amount;",
+                  "",
+                  "        // Debit source",
+                  "        pm.sendRequest({",
+                  "            url: `${pm.environment.get(\"base_url\")}/accounts/${sourceId}`,",
+                  "            method: \"PATCH\",",
+                  "            header: { \"Content-Type\": \"application/json\" },",
+                  "            body: { mode: \"raw\", raw: JSON.stringify({ balance: newSourceBalance }) }",
+                  "        }, function(err3, res3) {",
+                  "            if (err3) console.error(\"Failed to debit source account:\", err3);",
+                  "        });",
+                  "",
+                  "        // Credit destination",
+                  "        pm.sendRequest({",
+                  "            url: `${pm.environment.get(\"base_url\")}/accounts/${destinationId}`,",
+                  "            method: \"PATCH\",",
+                  "            header: { \"Content-Type\": \"application/json\" },",
+                  "            body: { mode: \"raw\", raw: JSON.stringify({ balance: newDestinationBalance }) }",
+                  "        }, function(err4, res4) {",
+                  "            if (err4) console.error(\"Failed to credit destination account:\", err4);",
+                  "        });",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Basic transfer executed\", function () {",
+                  "    pm.expect(true).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": {{transferAmount}},\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"SUCCESS\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Transfer - With Logging",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();",
+                  "",
+                  "pm.environment.set(\"transactionId\", res.transactionId);",
+                  "",
+                  "pm.test(\"Transfer logged successfully\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Transaction type is TRANSFER\", function () {",
+                  "    pm.expect(res.type).to.eql(\"TRANSFER\");",
+                  "});",
+                  "",
+                  "pm.test(\"Source account correct\", function () {",
+                  "    pm.expect(res.sourceAccountId).to.eql(pm.environment.get(\"sourceAccountId\"));",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": {{transferAmount}},\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"SUCCESS\",\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Transfer – Failed Transfer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Failed transfer recorded\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Transaction marked FAILED\", function () {\r",
+                  "    pm.expect(res.status).to.eql(\"FAILED\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Failure reason captured\", function () {\r",
+                  "    pm.expect(res.failureReason).to.include(\"Insufficient\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": 999999,\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"FAILED\",\r\n  \"failureReason\": \"Insufficient balance\",\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Transfer - Idempotency Protection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Transaction recorded\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Idempotency key stored\", function () {\r",
+                  "    pm.expect(res.idempotencyKey).to.eql(pm.environment.get(\"idempotencyKey\"));\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": {{transferAmount}},\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"SUCCESS\",\r\n  \"idempotencyKey\": \"{{idempotencyKey}}\",\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Transfer – Idempotency Guard (Simulated Fix)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "let idempotencyKey = pm.environment.get(\"transactionId\");",
+                  "let baseUrl = pm.environment.get(\"base_url\");",
+                  "",
+                  "pm.sendRequest(baseUrl + \"/transactions\", function (err, res) {",
+                  "",
+                  "    if (err || !res) {",
+                  "        console.error(\"Pre-request check failed:\", err);",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    let transactions = res.json();",
+                  "",
+                  "    let duplicate = transactions.find(t => t.idempotencyKey === idempotencyKey);",
+                  "",
+                  "    if (duplicate) {",
+                  "        console.log(\"Duplicate transaction detected\");",
+                  "        pm.execution.setNextRequest(null);",
+                  "        throw new Error(\"Duplicate transfer prevented by idempotency check\");",
+                  "    }",
+                  "",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"{{transactionId}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": {{transferAmount}},\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"SUCCESS\",\r\n  \"idempotencyKey\": \"{{transactionId}}\",\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05_Compliance & Validation",
+      "item": [
+        {
+          "name": "Daily Limit Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Daily limit exceeded scenario logged\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Failure reason captured\", function () {\r",
+                  "    pm.expect(res.failureReason).to.include(\"limit\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": 15000,\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"FAILED\",\r\n  \"failureReason\": \"Daily transfer limit exceeded\",\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Frozen Account Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Frozen account transaction blocked\", function () {\r",
+                  "    pm.expect(res.failureReason).to.include(\"frozen\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": {{transferAmount}},\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"FAILED\",\r\n  \"failureReason\": \"Account is frozen\",\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "High Value Transaction AML Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"AML monitoring triggered\", function () {\r",
+                  "    pm.expect(res.amlFlag).to.eql(true);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": 50000,\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"FLAGGED\",\r\n  \"amlFlag\": true,\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suspicious Rapid Transfers",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "let transferCount = pm.environment.get(\"rapidTransferCount\") || 0;\r",
+                  "transferCount++;\r",
+                  "\r",
+                  "pm.environment.set(\"rapidTransferCount\", transferCount);\r",
+                  "\r",
+                  "if (transferCount > 3) {\r",
+                  "    throw new Error(\"Suspicious transfer pattern detected\");\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": 1000,\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"FLAGGED\",\r\n  \"fraudAlert\": true,\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06_Negative Testing",
+      "item": [
+        {
+          "name": "Invalid Account Transfer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Invalid account transaction logged\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Failure reason contains invalid account\", function () {\r",
+                  "    pm.expect(res.failureReason).to.include(\"Invalid\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"INVALID123\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": 500,\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"FAILED\",\r\n  \"failureReason\": \"Invalid source account\",\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Negative Amount Transfer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Negative amount rejected\", function () {\r",
+                  "    pm.expect(res.failureReason).to.include(\"Negative\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": -1000,\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"FAILED\",\r\n  \"failureReason\": \"Negative transaction amount\",\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Currency Transfer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Invalid currency handled\", function () {\r",
+                  "    pm.expect(res.failureReason).to.include(\"currency\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": 500,\r\n  \"currency\": \"USD\",\r\n  \"status\": \"FAILED\",\r\n  \"failureReason\": \"Unsupported currency\",\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Missing Destination Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Destination account missing validation\", function () {\r",
+                  "    pm.expect(res.failureReason).to.include(\"missing\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"amount\": 500,\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"FAILED\",\r\n  \"failureReason\": \"Destination account missing\",\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "07_Edge Cases & Risk Scenarios",
+      "item": [
+        {
+          "name": "Rapid Consecutive Transfers",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "let transferCount = pm.environment.get(\"rapidTransferCount\") || 0;\r",
+                  "\r",
+                  "transferCount++;\r",
+                  "\r",
+                  "pm.environment.set(\"rapidTransferCount\", transferCount);\r",
+                  "\r",
+                  "if (transferCount > 5) {\r",
+                  "\r",
+                  "    throw new Error(\"Suspicious rapid transfers detected\");\r",
+                  "\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": 200,\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"FLAGGED\",\r\n  \"fraudAlert\": true\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "High Value Transaction Spike",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"High value transaction flagged\", function () {\r",
+                  "    pm.expect(res.amlFlag).to.eql(true);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": 100000,\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"FLAGGED\",\r\n  \"amlFlag\": true,\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Currency Mismatch Transfer",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": 1000,\r\n  \"currency\": \"USD\",\r\n  \"status\": \"FAILED\",\r\n  \"failureReason\": \"Currency mismatch\",\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Transfer After Account Freeze",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"transactionId\": \"TXN-{{$timestamp}}\",\r\n  \"type\": \"TRANSFER\",\r\n  \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n  \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n  \"amount\": 500,\r\n  \"currency\": \"{{currency}}\",\r\n  \"status\": \"FAILED\",\r\n  \"failureReason\": \"Account frozen\",\r\n  \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "08_End-to-End Business Flows",
+      "item": [
+        {
+          "name": "E2E - Retrieve accounts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let accounts = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Accounts retrieved successfully\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"At least two accounts exist for transfer flow\", function () {\r",
+                  "    pm.expect(accounts.length).to.be.above(1);\r",
+                  "});\r",
+                  "\r",
+                  "pm.environment.set(\"sourceAccountId\", accounts[0].id);\r",
+                  "pm.environment.set(\"destinationAccountId\", accounts[1].id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 1000,\r\n  \"currency\": \"{{currency}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/accounts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "E2E - Deposit funds",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deposit API executed\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.environment.set(\"currentBalance\", res.balance);\r",
+                  "\r",
+                  "pm.test(\"Balance updated after deposit\", function () {\r",
+                  "    pm.expect(res.balance).to.be.above(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "let balance = parseFloat(pm.environment.get(\"currentBalance\") || 0);\r",
+                  "\r",
+                  "let depositedBalance = balance + 2000;\r",
+                  "\r",
+                  "pm.environment.set(\"depositedBalance\", depositedBalance);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n \"balance\": {{depositedBalance}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/accounts/{{sourceAccountId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "accounts",
+                "{{sourceAccountId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "E2E - Transfer Funds",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Transfer request recorded\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "let res = pm.response.json();\r",
+                  "\r",
+                  "pm.environment.set(\"transactionId\", res.transactionId);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"transactionId\": \"TXN-{{$timestamp}}\",\r\n \"type\": \"TRANSFER\",\r\n \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n \"amount\": 1000,\r\n \"currency\": \"{{currency}}\",\r\n \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "E2E - Verify Balances",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let accounts = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Accounts retrieved\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "let source = accounts.find(a => a.id === pm.environment.get(\"sourceAccountId\"));\r",
+                  "let destination = accounts.find(a => a.id === pm.environment.get(\"destinationAccountId\"));\r",
+                  "\r",
+                  "pm.test(\"Source account exists\", function () {\r",
+                  "    pm.expect(source).to.not.eql(undefined);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Destination account exists\", function () {\r",
+                  "    pm.expect(destination).to.not.eql(undefined);\r",
+                  "});\r",
+                  "\r",
+                  "console.log(\"Source Balance:\", source.balance);\r",
+                  "console.log(\"Destination Balance:\", destination.balance);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 1000,\r\n  \"currency\": \"{{currency}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/accounts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "09_Defect Simulation & Observations",
+      "item": [
+        {
+          "name": "DEFECT – Duplicate Transaction Allowed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Transaction recorded\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "console.log(\"DEFECT OBSERVED:\");\r",
+                  "console.log(\"System allows duplicate transaction IDs.\");\r",
+                  "console.log(\"Expected: Transaction should be rejected.\");\r",
+                  "console.log(\"Impact: Possible double debit.\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"transactionId\": \"TXN-DUPLICATE-001\",\r\n \"type\": \"TRANSFER\",\r\n \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n \"amount\": 500,\r\n \"currency\": \"{{currency}}\",\r\n \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DEFECT – Invalid Currency Accepted",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Transaction accepted with invalid currency\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "console.log(\"DEFECT:\");\r",
+                  "console.log(\"System accepted unsupported currency.\");\r",
+                  "console.log(\"Expected: Reject transaction.\");\r",
+                  "console.log(\"Impact: Financial reporting errors.\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"transactionId\": \"TXN-CURRENCY-001\",\r\n \"type\": \"TRANSFER\",\r\n \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n \"amount\": 700,\r\n \"currency\": \"XYZ\",\r\n \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Freeze Account (Defect Test)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"status\": \"Frozen\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/accounts/{{sourceAccountId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "accounts",
+                "{{sourceAccountId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DEFECT – Frozen Account Transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Transaction processed despite frozen account\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "console.log(\"DEFECT:\");\r",
+                  "console.log(\"Frozen accounts should not allow transactions.\");\r",
+                  "console.log(\"Impact: Compliance violation.\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"transactionId\": \"TXN-FROZEN-001\",\r\n \"type\": \"TRANSFER\",\r\n \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n \"amount\": 400,\r\n \"currency\": \"{{currency}}\",\r\n \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DEFECT – Negative Transfer Amount",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Transaction accepted with negative amount\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "console.log(\"DEFECT:\");\r",
+                  "console.log(\"System allows negative transfer.\");\r",
+                  "console.log(\"Expected: Reject invalid amount.\");\r",
+                  "console.log(\"Impact: Data corruption.\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"transactionId\": \"TXN-NEGATIVE-001\",\r\n \"type\": \"TRANSFER\",\r\n \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n \"amount\": -500,\r\n \"currency\": \"{{currency}}\",\r\n \"timestamp\": \"{{$isoTimestamp}}\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10_Automated Transaction Simulation",
+      "item": [
+        {
+          "name": "Automated Transfer Simulation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let amount = pm.iterationData.get(\"transferAmount\");\r",
+                  "let currency = pm.iterationData.get(\"currency\");\r",
+                  "let accountStatus = pm.iterationData.get(\"accountStatus\");\r",
+                  "\r",
+                  "pm.test(\"Transaction request recorded\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "console.log(\"Scenario executed:\");\r",
+                  "console.log(\"Amount:\", amount);\r",
+                  "console.log(\"Currency:\", currency);\r",
+                  "console.log(\"Account Status:\", accountStatus);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"transactionId\": \"TXN-{{$timestamp}}\",\r\n \"type\": \"TRANSFER\",\r\n \"sourceAccountId\": \"{{sourceAccountId}}\",\r\n \"destinationAccountId\": \"{{destinationAccountId}}\",\r\n \"amount\": {{transferAmount}},\r\n \"currency\": \"{{currency}}\",\r\n \"timestamp\": \"{{$isoTimestamp}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

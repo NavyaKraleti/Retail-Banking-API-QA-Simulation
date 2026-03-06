@@ -1,0 +1,11 @@
+transferAmount,currency,accountStatus
+500,AED,Active
+1500,AED,Active
+20000,AED,Active
+300,USD,Active
+700,AED,Frozen
+100,AED,Active
+900,AED,Active
+25000,AED,Active
+450,AED,Active
+1200,AED,Active
