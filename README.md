@@ -27,7 +27,9 @@ The testing architecture follows a simple API automation pipeline.
 
 Test data is executed through Postman collections and automated using Newman CLI against a simulated banking API built with JSON Server.
 
-![Architecture Diagram](test-documents/Architecture_Diagram.png)
+<p align="center">
+  <img src="test-documents/Architecture_Diagram.png" width="600">
+</p>
 
 **Architecture Flow**
 
