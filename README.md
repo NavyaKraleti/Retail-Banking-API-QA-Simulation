@@ -37,9 +37,17 @@ The project showcases how QA engineers design API test strategies, validate fina
 </p>
 
 ### Architecture Flow
-
-Test Data (transactions.csv) → Postman API Collection → Newman CLI Automation → Mock Banking API (JSON Server) → Database (db.json)
-
+```
+Test Data (transactions.csv)
+        ↓
+Postman API Collection
+        ↓
+Newman CLI Automation
+        ↓
+Mock Banking API (JSON Server)
+        ↓
+Database (db.json)
+```
 ---
 
 ## Technology Stack
@@ -57,6 +65,7 @@ Test Data (transactions.csv) → Postman API Collection → Newman CLI Automatio
 ---
 
 ## Project Structure
+```
 
 Retail-Banking-API-QA-Simulation
 │
@@ -74,6 +83,7 @@ Retail-Banking-API-QA-Simulation
 ├── README.md
 └── .gitignore
 
+```
 ---
 
 ## How to Run the Project
